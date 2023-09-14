@@ -53,6 +53,12 @@ class RinhaAstToJavaSourceTest {
     void testFib() {
         run("/examples/fib.json","fib: 55");
     }
+   
+    @Test
+    @SneakyThrows
+    void testCombination() {
+        run("/examples/combination.json","45");
+    }
     
     @SneakyThrows 
     void run(String astJsonPath, String expect ) {
