@@ -2,26 +2,33 @@ package br.com.rinha.compiladores.translate;
 
 import static com.github.javaparser.ast.Modifier.publicModifier;
 import static com.github.javaparser.ast.Modifier.staticModifier;
+import static com.github.javaparser.ast.Modifier.Keyword.PRIVATE;
+import static com.github.javaparser.ast.Modifier.Keyword.PUBLIC;
 import static com.github.javaparser.ast.NodeList.nodeList;
-import static com.github.javaparser.ast.type.PrimitiveType.intType;
+import static com.github.javaparser.ast.type.PrimitiveType.longType;
 import static java.util.Arrays.asList;
 import static org.apache.commons.text.CaseUtils.toCamelCase;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Map;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.Modifier.Keyword;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.BinaryExpr.Operator;
 import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.IntegerLiteralExpr;
+import com.github.javaparser.ast.expr.LongLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.SimpleName;
@@ -32,6 +39,7 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.VarType;
 import com.github.javaparser.ast.type.VoidType;
@@ -50,7 +58,9 @@ public class RinhaAstToJavaSource {
 
         var translatedClass = cu.addClass(getClassName(pathArray));
         translatedClass.addImplementedType(InMemoryClass.class);
-
+        
+        translatedClass.addMember(createTupleClass());
+        
         var runCode = new MethodDeclaration(
                 nodeList(asList(publicModifier())),
                 new VoidType(),
@@ -78,9 +88,34 @@ public class RinhaAstToJavaSource {
             expression = expression.getJSONObject("next");
 
         } while (expression != null);
-
+        
+        
         return cu;
     }
+    
+    
+    private static ClassOrInterfaceDeclaration createTupleClass() {
+        
+        var tupleClass = new ClassOrInterfaceDeclaration(nodeList(asList(publicModifier(), staticModifier())), false, "Tuple");
+        
+        tupleClass.addField(Object.class, "first", PRIVATE);       
+        tupleClass.addField(Object.class, "second", PRIVATE);       
+        
+        var getFisrtMethod = new MethodDeclaration(nodeList(asList(publicModifier())), new ClassOrInterfaceType(null,"Object"), "getFirst");
+        tupleClass.addMember(getFisrtMethod);
+        var getFirstBody = getFisrtMethod.createBody();
+        getFirstBody.addStatement(new ReturnStmt("first"));
+        
+        var getSecondMethod = new MethodDeclaration(nodeList(asList(publicModifier())), new ClassOrInterfaceType(null,"Object"), "getSecond");
+        tupleClass.addMember(getSecondMethod);
+        var getSecondBody = getSecondMethod.createBody();
+        getSecondBody.addStatement(new ReturnStmt("second"));
+        
+                
+        return tupleClass;
+    }
+    
+    
 
     private static void populateBlockBody(BlockStmt blockStmt, JSONObject expression) {
         populateBlockBody(blockStmt, expression, false);
@@ -149,19 +184,19 @@ public class RinhaAstToJavaSource {
         return new MethodDeclaration(
                 nodeList(asList(publicModifier(), staticModifier())),
                 expression.getJSONObject("name").getString("text"),
-                new PrimitiveType(),
+                PrimitiveType.longType(),
                 toTypesParameters(expression.getJSONObject("value").getJSONArray("parameters")));
     }
 
     private static NodeList<Parameter> toTypesParameters(JSONArray parameters) {
 
         return new NodeList<>(parameters.stream()
-                .map(parameter -> new Parameter(intType(), ((JSONObject) parameter).getString("text")))
+                .map(parameter -> new Parameter(longType(), ((JSONObject) parameter).getString("text")))
                 .toList());
     }
 
     private static Expression intToExpression(JSONObject expression) {
-        return new IntegerLiteralExpr(String.valueOf(expression.getInteger("value")));
+        return new LongLiteralExpr(String.valueOf(expression.getLongValue("value")));
     }
 
     private static Expression strToExpression(JSONObject expression) {
@@ -173,7 +208,7 @@ public class RinhaAstToJavaSource {
     }
 
     private static Expression printToExpression(JSONObject expression) {
-        return new MethodCallExpr("System.out.print", handleExpression(expression.getJSONObject("value")));
+        return new MethodCallExpr("System.out.println", handleExpression(expression.getJSONObject("value")));
     }
 
     private static Expression binaryToExpression(JSONObject binary) {
