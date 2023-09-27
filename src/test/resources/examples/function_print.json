@@ -1,0 +1,78 @@
+{
+	"name": "examples/function_print.rinha",
+	"expression": {
+		"kind": "Call",
+		"callee": {
+			"kind": "Var",
+			"text": "f",
+			"location": {
+				"start": 0,
+				"end": 1,
+				"filename": "examples/function_print.rinha"
+			}
+		},
+		"arguments": [
+			{
+				"kind": "Print",
+				"value": {
+					"kind": "Int",
+					"value": 1,
+					"location": {
+						"start": 8,
+						"end": 9,
+						"filename": "examples/function_print.rinha"
+					}
+				},
+				"location": {
+					"start": 2,
+					"end": 10,
+					"filename": "examples/function_print.rinha"
+				}
+			},
+			{
+				"kind": "Print",
+				"value": {
+					"kind": "Int",
+					"value": 2,
+					"location": {
+						"start": 18,
+						"end": 19,
+						"filename": "examples/function_print.rinha"
+					}
+				},
+				"location": {
+					"start": 12,
+					"end": 20,
+					"filename": "examples/function_print.rinha"
+				}
+			},
+			{
+				"kind": "Print",
+				"value": {
+					"kind": "Int",
+					"value": 3,
+					"location": {
+						"start": 28,
+						"end": 29,
+						"filename": "examples/function_print.rinha"
+					}
+				},
+				"location": {
+					"start": 22,
+					"end": 30,
+					"filename": "examples/function_print.rinha"
+				}
+			}
+		],
+		"location": {
+			"start": 0,
+			"end": 31,
+			"filename": "examples/function_print.rinha"
+		}
+	},
+	"location": {
+		"start": 0,
+		"end": 31,
+		"filename": "examples/function_print.rinha"
+	}
+}
