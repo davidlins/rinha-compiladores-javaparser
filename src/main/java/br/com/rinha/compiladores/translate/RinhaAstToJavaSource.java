@@ -2,7 +2,6 @@ package br.com.rinha.compiladores.translate;
 
 import static com.github.javaparser.ast.Modifier.publicModifier;
 import static com.github.javaparser.ast.Modifier.staticModifier;
-import static com.github.javaparser.ast.Modifier.Keyword.PRIVATE;
 import static com.github.javaparser.ast.NodeList.nodeList;
 import static com.github.javaparser.ast.type.PrimitiveType.longType;
 import static java.util.Arrays.asList;
@@ -16,23 +15,18 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.BinaryExpr.Operator;
 import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.LongLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
-import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
@@ -45,6 +39,7 @@ import com.github.javaparser.ast.type.VarType;
 import com.github.javaparser.ast.type.VoidType;
 
 import br.com.rinha.compiladores.runtime.InMemoryClass;
+import br.com.rinha.compiladores.runtime.Tuple;
 
 public class RinhaAstToJavaSource {
 
@@ -58,12 +53,9 @@ public class RinhaAstToJavaSource {
 
         var translatedClass = cu.addClass(getClassName(pathArray));
         translatedClass.addImplementedType(InMemoryClass.class);
-
-        translatedClass.addMember(createTupleClass());
-        translatedClass.addMember(createFirstMethod());
-        translatedClass.addMember(createSecondMethod());
-        translatedClass.addMember(createPrintMethod());
-        translatedClass.addMember(createPrintIntMethod());
+        cu.addImport(Tuple.class);
+        cu.addImport(Tuple.class.getCanonicalName(), true, true);
+        cu.addImport(InMemoryClass.class.getCanonicalName(), true, true);
 
         var runCode = new MethodDeclaration(
                 nodeList(asList(publicModifier())),
@@ -108,113 +100,113 @@ public class RinhaAstToJavaSource {
         return toCamelCase(pathArray[pathArray.length - 1], true, ' ');
     }
 
-    private static ClassOrInterfaceDeclaration createTupleClass() {
+//    private static ClassOrInterfaceDeclaration createTupleClass() {
+//
+//        var tupleClass = new ClassOrInterfaceDeclaration(nodeList(asList(publicModifier(), staticModifier())), false,
+//                "Tuple");
+//
+//        tupleClass.addField(Object.class, "first", PRIVATE);
+//        tupleClass.addField(Object.class, "second", PRIVATE);
+//
+//        var constructorBlockStmt = new BlockStmt();
+//        constructorBlockStmt.addStatement(new ExpressionStmt(
+//                new AssignExpr(
+//                        new FieldAccessExpr(new ThisExpr(), "first"),
+//                        new NameExpr("first"),
+//                        AssignExpr.Operator.ASSIGN)));
+//        constructorBlockStmt.addStatement(new ExpressionStmt(
+//                new AssignExpr(
+//                        new FieldAccessExpr(new ThisExpr(), "second"),
+//                        new NameExpr("second"),
+//                        AssignExpr.Operator.ASSIGN)));
+//
+//        var contructor = new ConstructorDeclaration(nodeList(asList(publicModifier())),
+//                new NodeList<>(),
+//                new NodeList<>(),
+//                new SimpleName("Tuple"),
+//                nodeList(asList(new Parameter(new ClassOrInterfaceType(null, "Object"), "first"),
+//                        new Parameter(new ClassOrInterfaceType(null, "Object"), "second"))),
+//                new NodeList<>(), constructorBlockStmt);
+//
+//        tupleClass.addMember(contructor);
+//
+//        var getFisrtMethod = new MethodDeclaration(nodeList(asList(publicModifier())),
+//                new ClassOrInterfaceType(null, "Object"), "getFirst");
+//        tupleClass.addMember(getFisrtMethod);
+//        var getFirstBody = getFisrtMethod.createBody();
+//        getFirstBody.addStatement(new ReturnStmt("first"));
+//
+//        var getSecondMethod = new MethodDeclaration(nodeList(asList(publicModifier())),
+//                new ClassOrInterfaceType(null, "Object"), "getSecond");
+//        tupleClass.addMember(getSecondMethod);
+//        var getSecondBody = getSecondMethod.createBody();
+//        getSecondBody.addStatement(new ReturnStmt("second"));
+//
+//        
+//        var toStringMethod = new MethodDeclaration(nodeList(asList(publicModifier())),
+//                new ClassOrInterfaceType(null, "String"), "toString");
+//        tupleClass.addMember(toStringMethod);
+//        var toStringBody = toStringMethod.createBody();
+//        toStringBody.addStatement(new ReturnStmt("\"(\"+first+\", \"+second+\")\""));
+//
+//        return tupleClass;
+//    }
 
-        var tupleClass = new ClassOrInterfaceDeclaration(nodeList(asList(publicModifier(), staticModifier())), false,
-                "Tuple");
+//    private static MethodDeclaration createFirstMethod() {
+//
+//        var fisrtMethod = new MethodDeclaration(
+//                nodeList(asList(publicModifier(), staticModifier())),
+//                "first",
+//                new ClassOrInterfaceType(null, "Object"),
+//                nodeList(asList(new Parameter(new ClassOrInterfaceType(null, "Tuple"), "tuple"))));
+//
+//        var body = fisrtMethod.getBody().orElseThrow();
+//        body.addStatement(new ReturnStmt(new MethodCallExpr(new NameExpr("tuple"), new SimpleName("getFirst"))));
+//        return fisrtMethod;
+//    }
+//
+//    private static MethodDeclaration createSecondMethod() {
+//
+//        var fisrtMethod = new MethodDeclaration(
+//                nodeList(asList(publicModifier(), staticModifier())),
+//                "second",
+//                new ClassOrInterfaceType(null, "Object"),
+//                nodeList(asList(new Parameter(new ClassOrInterfaceType(null, "Tuple"), "tuple"))));
+//
+//        var body = fisrtMethod.getBody().orElseThrow();
+//        body.addStatement(new ReturnStmt(new MethodCallExpr(new NameExpr("tuple"), new SimpleName("getSecond"))));
+//        return fisrtMethod;
+//    }
 
-        tupleClass.addField(Object.class, "first", PRIVATE);
-        tupleClass.addField(Object.class, "second", PRIVATE);
+//    private static MethodDeclaration createPrintMethod() {
+//
+//        var printMethod = new MethodDeclaration(
+//                nodeList(asList(publicModifier(), staticModifier())),
+//                "print",
+//                new ClassOrInterfaceType(null, "Object"),
+//                nodeList(asList(new Parameter(new ClassOrInterfaceType(null, "Object"), "value"))));
+//
+//        var body = printMethod.getBody().orElseThrow();
+//        body.addStatement(new MethodCallExpr("System.out.print",new NameExpr("value")));
+//        body.addStatement(new MethodCallExpr("System.out.println"));
+//        body.addStatement(new ReturnStmt(new NameExpr("value")));
+//        return printMethod;
+//    }
 
-        var constructorBlockStmt = new BlockStmt();
-        constructorBlockStmt.addStatement(new ExpressionStmt(
-                new AssignExpr(
-                        new FieldAccessExpr(new ThisExpr(), "first"),
-                        new NameExpr("first"),
-                        AssignExpr.Operator.ASSIGN)));
-        constructorBlockStmt.addStatement(new ExpressionStmt(
-                new AssignExpr(
-                        new FieldAccessExpr(new ThisExpr(), "second"),
-                        new NameExpr("second"),
-                        AssignExpr.Operator.ASSIGN)));
-
-        var contructor = new ConstructorDeclaration(nodeList(asList(publicModifier())),
-                new NodeList<>(),
-                new NodeList<>(),
-                new SimpleName("Tuple"),
-                nodeList(asList(new Parameter(new ClassOrInterfaceType(null, "Object"), "first"),
-                        new Parameter(new ClassOrInterfaceType(null, "Object"), "second"))),
-                new NodeList<>(), constructorBlockStmt);
-
-        tupleClass.addMember(contructor);
-
-        var getFisrtMethod = new MethodDeclaration(nodeList(asList(publicModifier())),
-                new ClassOrInterfaceType(null, "Object"), "getFirst");
-        tupleClass.addMember(getFisrtMethod);
-        var getFirstBody = getFisrtMethod.createBody();
-        getFirstBody.addStatement(new ReturnStmt("first"));
-
-        var getSecondMethod = new MethodDeclaration(nodeList(asList(publicModifier())),
-                new ClassOrInterfaceType(null, "Object"), "getSecond");
-        tupleClass.addMember(getSecondMethod);
-        var getSecondBody = getSecondMethod.createBody();
-        getSecondBody.addStatement(new ReturnStmt("second"));
-
-        
-        var toStringMethod = new MethodDeclaration(nodeList(asList(publicModifier())),
-                new ClassOrInterfaceType(null, "String"), "toString");
-        tupleClass.addMember(toStringMethod);
-        var toStringBody = toStringMethod.createBody();
-        toStringBody.addStatement(new ReturnStmt("\"(\"+first+\", \"+second+\")\""));
-
-        return tupleClass;
-    }
-
-    private static MethodDeclaration createFirstMethod() {
-
-        var fisrtMethod = new MethodDeclaration(
-                nodeList(asList(publicModifier(), staticModifier())),
-                "first",
-                new ClassOrInterfaceType(null, "Object"),
-                nodeList(asList(new Parameter(new ClassOrInterfaceType(null, "Tuple"), "tuple"))));
-
-        var body = fisrtMethod.getBody().orElseThrow();
-        body.addStatement(new ReturnStmt(new MethodCallExpr(new NameExpr("tuple"), new SimpleName("getFirst"))));
-        return fisrtMethod;
-    }
-
-    private static MethodDeclaration createSecondMethod() {
-
-        var fisrtMethod = new MethodDeclaration(
-                nodeList(asList(publicModifier(), staticModifier())),
-                "second",
-                new ClassOrInterfaceType(null, "Object"),
-                nodeList(asList(new Parameter(new ClassOrInterfaceType(null, "Tuple"), "tuple"))));
-
-        var body = fisrtMethod.getBody().orElseThrow();
-        body.addStatement(new ReturnStmt(new MethodCallExpr(new NameExpr("tuple"), new SimpleName("getSecond"))));
-        return fisrtMethod;
-    }
-    
-    private static MethodDeclaration createPrintMethod() {
-
-        var printMethod = new MethodDeclaration(
-                nodeList(asList(publicModifier(), staticModifier())),
-                "print",
-                new ClassOrInterfaceType(null, "Object"),
-                nodeList(asList(new Parameter(new ClassOrInterfaceType(null, "Object"), "value"))));
-
-        var body = printMethod.getBody().orElseThrow();
-        body.addStatement(new MethodCallExpr("System.out.print",new NameExpr("value")));
-        body.addStatement(new MethodCallExpr("System.out.println"));
-        body.addStatement(new ReturnStmt(new NameExpr("value")));
-        return printMethod;
-    }
-    
-    private static MethodDeclaration createPrintIntMethod() {
-
-        var printMethod = new MethodDeclaration(
-                nodeList(asList(publicModifier(), staticModifier())),
-                "print",
-                PrimitiveType.intType(),
-                nodeList(asList(new Parameter(PrimitiveType.intType(), "value"))));
-
-        var body = printMethod.getBody().orElseThrow();
-        body.addStatement(new MethodCallExpr("System.out.print",new NameExpr("value")));
-        body.addStatement(new MethodCallExpr("System.out.println"));
-        body.addStatement(new ReturnStmt(new NameExpr("value")));
-        return printMethod;
-    }
+//    private static MethodDeclaration createPrintIntMethod() {
+//
+//        var printMethod = new MethodDeclaration(
+//                nodeList(asList(publicModifier(), staticModifier())),
+//                "print",
+//                PrimitiveType.intType(),
+//                nodeList(asList(new Parameter(PrimitiveType.intType(), "value"))));
+//
+//        var body = printMethod.getBody().orElseThrow();
+//        body.addStatement(new MethodCallExpr("System.out.print",new NameExpr("value")));
+//        body.addStatement(new MethodCallExpr("System.out.println"));
+//        body.addStatement(new ReturnStmt(new NameExpr("value")));
+//        return printMethod;
+//    }
 
     private static MethodDeclaration createMethod(JSONObject expression) {
         return new MethodDeclaration(
@@ -298,7 +290,7 @@ public class RinhaAstToJavaSource {
 
     private static Expression varToExpression(JSONObject expression) {
         var name = expression.getString("text");
-        if(name.equals("_")) {
+        if (name.equals("_")) {
             name = "underscore";
         }
         return new NameExpr(name);
@@ -317,12 +309,12 @@ public class RinhaAstToJavaSource {
     }
 
     private static Expression letToExpression(JSONObject value) {
-        
+
         var name = value.getJSONObject("name").getString("text");
-        if(name.equals("_")) {
+        if (name.equals("_")) {
             name = "underscore";
         }
-        
+
         return new VariableDeclarationExpr(
                 new VariableDeclarator(new VarType(), new SimpleName(name),
                         handleExpression(value.getJSONObject("value"))));
