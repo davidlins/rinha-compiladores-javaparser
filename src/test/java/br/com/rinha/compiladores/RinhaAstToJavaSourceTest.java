@@ -32,6 +32,12 @@ class RinhaAstToJavaSourceTest {
     void testAdd() {
         run("/examples/add.json", "1 + 2 = 12");
     }
+    
+    @Test
+    @SneakyThrows
+    void testAdd2() {
+        run("/examples/add2.json", "2a");
+    }
 
     @Test
     @SneakyThrows
@@ -54,7 +60,7 @@ class RinhaAstToJavaSourceTest {
     @Test
     @SneakyThrows
     void testFibRec() {
-        run("/examples/fibrec.json", "55");
+        run("/examples/fibrec.json", "1836311903");
     }
 
     @Test

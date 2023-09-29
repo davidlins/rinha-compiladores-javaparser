@@ -5,11 +5,9 @@ public interface Binary {
 
     static Object handleBinary(Object lhs, String op, Object rhs) {
        
-//        System.err.println(lhs+op+rhs);
-        
         switch (op.toUpperCase()) {
         case "ADD":
-            return (lhs instanceof Integer) ? (Integer) lhs + (Integer) rhs : (String) lhs + rhs;
+            return (lhs instanceof String || rhs instanceof String) ? lhs.toString() + rhs.toString() : (Integer) lhs + (Integer) rhs ;
         case "SUB":
             return (Integer) lhs - (Integer) rhs ;
         case "MUL":

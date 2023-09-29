@@ -3,6 +3,7 @@ package br.com.rinha.compiladores.translate;
 import static com.github.javaparser.ast.Modifier.publicModifier;
 import static com.github.javaparser.ast.Modifier.staticModifier;
 import static com.github.javaparser.ast.NodeList.nodeList;
+import static java.lang.System.currentTimeMillis;
 import static java.util.Arrays.asList;
 import static org.apache.commons.text.CaseUtils.toCamelCase;
 
@@ -102,113 +103,7 @@ public class RinhaAstToJavaSource {
         return toCamelCase(pathArray[pathArray.length - 1], true, ' ');
     }
 
-//    private static ClassOrInterfaceDeclaration createTupleClass() {
-//
-//        var tupleClass = new ClassOrInterfaceDeclaration(nodeList(asList(publicModifier(), staticModifier())), false,
-//                "Tuple");
-//
-//        tupleClass.addField(Object.class, "first", PRIVATE);
-//        tupleClass.addField(Object.class, "second", PRIVATE);
-//
-//        var constructorBlockStmt = new BlockStmt();
-//        constructorBlockStmt.addStatement(new ExpressionStmt(
-//                new AssignExpr(
-//                        new FieldAccessExpr(new ThisExpr(), "first"),
-//                        new NameExpr("first"),
-//                        AssignExpr.Operator.ASSIGN)));
-//        constructorBlockStmt.addStatement(new ExpressionStmt(
-//                new AssignExpr(
-//                        new FieldAccessExpr(new ThisExpr(), "second"),
-//                        new NameExpr("second"),
-//                        AssignExpr.Operator.ASSIGN)));
-//
-//        var contructor = new ConstructorDeclaration(nodeList(asList(publicModifier())),
-//                new NodeList<>(),
-//                new NodeList<>(),
-//                new SimpleName("Tuple"),
-//                nodeList(asList(new Parameter(new ClassOrInterfaceType(null, "Object"), "first"),
-//                        new Parameter(new ClassOrInterfaceType(null, "Object"), "second"))),
-//                new NodeList<>(), constructorBlockStmt);
-//
-//        tupleClass.addMember(contructor);
-//
-//        var getFisrtMethod = new MethodDeclaration(nodeList(asList(publicModifier())),
-//                new ClassOrInterfaceType(null, "Object"), "getFirst");
-//        tupleClass.addMember(getFisrtMethod);
-//        var getFirstBody = getFisrtMethod.createBody();
-//        getFirstBody.addStatement(new ReturnStmt("first"));
-//
-//        var getSecondMethod = new MethodDeclaration(nodeList(asList(publicModifier())),
-//                new ClassOrInterfaceType(null, "Object"), "getSecond");
-//        tupleClass.addMember(getSecondMethod);
-//        var getSecondBody = getSecondMethod.createBody();
-//        getSecondBody.addStatement(new ReturnStmt("second"));
-//
-//        
-//        var toStringMethod = new MethodDeclaration(nodeList(asList(publicModifier())),
-//                new ClassOrInterfaceType(null, "String"), "toString");
-//        tupleClass.addMember(toStringMethod);
-//        var toStringBody = toStringMethod.createBody();
-//        toStringBody.addStatement(new ReturnStmt("\"(\"+first+\", \"+second+\")\""));
-//
-//        return tupleClass;
-//    }
 
-//    private static MethodDeclaration createFirstMethod() {
-//
-//        var fisrtMethod = new MethodDeclaration(
-//                nodeList(asList(publicModifier(), staticModifier())),
-//                "first",
-//                new ClassOrInterfaceType(null, "Object"),
-//                nodeList(asList(new Parameter(new ClassOrInterfaceType(null, "Tuple"), "tuple"))));
-//
-//        var body = fisrtMethod.getBody().orElseThrow();
-//        body.addStatement(new ReturnStmt(new MethodCallExpr(new NameExpr("tuple"), new SimpleName("getFirst"))));
-//        return fisrtMethod;
-//    }
-//
-//    private static MethodDeclaration createSecondMethod() {
-//
-//        var fisrtMethod = new MethodDeclaration(
-//                nodeList(asList(publicModifier(), staticModifier())),
-//                "second",
-//                new ClassOrInterfaceType(null, "Object"),
-//                nodeList(asList(new Parameter(new ClassOrInterfaceType(null, "Tuple"), "tuple"))));
-//
-//        var body = fisrtMethod.getBody().orElseThrow();
-//        body.addStatement(new ReturnStmt(new MethodCallExpr(new NameExpr("tuple"), new SimpleName("getSecond"))));
-//        return fisrtMethod;
-//    }
-
-//    private static MethodDeclaration createPrintMethod() {
-//
-//        var printMethod = new MethodDeclaration(
-//                nodeList(asList(publicModifier(), staticModifier())),
-//                "print",
-//                new ClassOrInterfaceType(null, "Object"),
-//                nodeList(asList(new Parameter(new ClassOrInterfaceType(null, "Object"), "value"))));
-//
-//        var body = printMethod.getBody().orElseThrow();
-//        body.addStatement(new MethodCallExpr("System.out.print",new NameExpr("value")));
-//        body.addStatement(new MethodCallExpr("System.out.println"));
-//        body.addStatement(new ReturnStmt(new NameExpr("value")));
-//        return printMethod;
-//    }
-
-//    private static MethodDeclaration createPrintIntMethod() {
-//
-//        var printMethod = new MethodDeclaration(
-//                nodeList(asList(publicModifier(), staticModifier())),
-//                "print",
-//                PrimitiveType.intType(),
-//                nodeList(asList(new Parameter(PrimitiveType.intType(), "value"))));
-//
-//        var body = printMethod.getBody().orElseThrow();
-//        body.addStatement(new MethodCallExpr("System.out.print",new NameExpr("value")));
-//        body.addStatement(new MethodCallExpr("System.out.println"));
-//        body.addStatement(new ReturnStmt(new NameExpr("value")));
-//        return printMethod;
-//    }
 
     private static MethodDeclaration createMethod(JSONObject expression) {
         return new MethodDeclaration(
@@ -217,10 +112,6 @@ public class RinhaAstToJavaSource {
                 new ClassOrInterfaceType(null, "Object"),
                 toTypesParameters(expression.getJSONObject("value").getJSONArray("parameters")));
     }
-
-//    private static void populateBlockBody(BlockStmt blockStmt, JSONObject expression) {
-//        populateBlockBody(blockStmt, expression, false);
-//    }
 
     private static void populateBlockBody(BlockStmt blockStmt, JSONObject expression) {
         do {
@@ -305,7 +196,7 @@ public class RinhaAstToJavaSource {
     private static Expression varToExpression(JSONObject expression) {
         var name = expression.getString("text");
         if (name.equals("_")) {
-            name = "underscore";
+            name = "_"+currentTimeMillis();
         }
         return new NameExpr(name);
     }

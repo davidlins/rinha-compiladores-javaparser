@@ -9,7 +9,8 @@ import static br.com.rinha.compiladores.runtime.InMemoryClass.*;
 public class Fibrec1 {
 
     public static void main(String ...args) {
-        print(fib(100000));
+        print(Integer.MAX_VALUE);
+        print(fib(46));
     }
 
     public static Object fibrec(Object wn, Object wk1, Object wk2) {
