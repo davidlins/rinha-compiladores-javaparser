@@ -3,7 +3,6 @@ package br.com.rinha.compiladores.translate;
 import static com.github.javaparser.ast.Modifier.publicModifier;
 import static com.github.javaparser.ast.Modifier.staticModifier;
 import static com.github.javaparser.ast.NodeList.nodeList;
-import static com.github.javaparser.ast.type.PrimitiveType.longType;
 import static java.util.Arrays.asList;
 import static org.apache.commons.text.CaseUtils.toCamelCase;
 
@@ -20,8 +19,10 @@ import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.BinaryExpr.Operator;
+import com.github.javaparser.ast.expr.BooleanLiteralExpr;
+import com.github.javaparser.ast.expr.CastExpr;
 import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.LongLiteralExpr;
+import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
@@ -34,10 +35,10 @@ import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
-import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.VarType;
 import com.github.javaparser.ast.type.VoidType;
 
+import br.com.rinha.compiladores.runtime.Binary;
 import br.com.rinha.compiladores.runtime.InMemoryClass;
 import br.com.rinha.compiladores.runtime.Tuple;
 
@@ -55,6 +56,7 @@ public class RinhaAstToJavaSource {
         translatedClass.addImplementedType(InMemoryClass.class);
         cu.addImport(Tuple.class);
         cu.addImport(Tuple.class.getCanonicalName(), true, true);
+        cu.addImport(Binary.class.getCanonicalName(), true, true);
         cu.addImport(InMemoryClass.class.getCanonicalName(), true, true);
 
         var runCode = new MethodDeclaration(
@@ -212,19 +214,20 @@ public class RinhaAstToJavaSource {
         return new MethodDeclaration(
                 nodeList(asList(publicModifier(), staticModifier())),
                 expression.getJSONObject("name").getString("text"),
-                PrimitiveType.longType(),
+                new ClassOrInterfaceType(null, "Object"),
                 toTypesParameters(expression.getJSONObject("value").getJSONArray("parameters")));
     }
 
-    private static void populateBlockBody(BlockStmt blockStmt, JSONObject expression) {
-        populateBlockBody(blockStmt, expression, false);
-    }
+//    private static void populateBlockBody(BlockStmt blockStmt, JSONObject expression) {
+//        populateBlockBody(blockStmt, expression, false);
+//    }
 
-    private static void populateBlockBody(BlockStmt blockStmt, JSONObject expression, boolean lastReturn) {
+    private static void populateBlockBody(BlockStmt blockStmt, JSONObject expression) {
         do {
 
-            blockStmt.addStatement((lastReturn && !expression.containsKey("next")) ? toReturnStmt(expression)
-                    : handleStatement(expression));
+            blockStmt.addStatement((!expression.containsKey("next")
+                    && !"If".equalsIgnoreCase(expression.getString("kind"))) ? toReturnStmt(expression)
+                            : handleStatement(expression));
             expression = expression.getJSONObject("next");
 
         } while (expression != null);
@@ -237,8 +240,8 @@ public class RinhaAstToJavaSource {
 
     private static Statement handleStatement(JSONObject expression) {
         var kind = expression.getString("kind");
-        switch (kind) {
-        case "If":
+        switch (kind.toUpperCase()) {
+        case "IF":
             return toIfStmt(expression);
         default:
             return new ExpressionStmt(handleExpression(expression));
@@ -246,27 +249,33 @@ public class RinhaAstToJavaSource {
     }
 
     private static Expression handleExpression(JSONObject expression) {
+        return handleExpression(expression, false);
+    }
+
+    private static Expression handleExpression(JSONObject expression, boolean appendToString) {
         var kind = expression.getString("kind");
-        switch (kind) {
-        case "Print":
+        switch (kind.toUpperCase()) {
+        case "PRINT":
             return printToExpression(expression);
-        case "Str":
+        case "STR":
             return strToExpression(expression);
-        case "Binary":
-            return binaryToExpression(expression);
-        case "Int":
+        case "BOOL":
+            boolToExpression(expression);
+        case "BINARY":
+            return binaryToExpression(expression, appendToString);
+        case "INT":
             return intToExpression(expression);
-        case "Let":
+        case "LET":
             return letToExpression(expression);
-        case "Var":
+        case "VAR":
             return varToExpression(expression);
-        case "Call":
+        case "CALL":
             return callToExpression(expression);
-        case "Tuple":
+        case "TUPLE":
             return tuplaToExpression(expression);
-        case "First":
+        case "FIRST":
             return callFirstToExpression(expression);
-        case "Second":
+        case "SECOND":
             return callSecondToExpression(expression);
         default:
             throw new IllegalArgumentException("Unexpected kind value: " + kind);
@@ -276,16 +285,21 @@ public class RinhaAstToJavaSource {
     private static NodeList<Parameter> toTypesParameters(JSONArray parameters) {
 
         return new NodeList<>(parameters.stream()
-                .map(parameter -> new Parameter(longType(), ((JSONObject) parameter).getString("text")))
+                .map(parameter -> new Parameter(new ClassOrInterfaceType(null, "Object"),
+                        ((JSONObject) parameter).getString("text")))
                 .toList());
     }
 
     private static Expression intToExpression(JSONObject expression) {
-        return new LongLiteralExpr(String.valueOf(expression.getLongValue("value")));
+        return new IntegerLiteralExpr(String.valueOf(expression.getLongValue("value")));
     }
 
     private static Expression strToExpression(JSONObject expression) {
         return new StringLiteralExpr(expression.getString("value"));
+    }
+
+    private static Expression boolToExpression(JSONObject expression) {
+        return new BooleanLiteralExpr(Boolean.valueOf(expression.getString("value")));
     }
 
     private static Expression varToExpression(JSONObject expression) {
@@ -300,12 +314,18 @@ public class RinhaAstToJavaSource {
         return new MethodCallExpr("print", handleExpression(expression.getJSONObject("value")));
     }
 
-    private static Expression binaryToExpression(JSONObject binary) {
+    private static Expression binaryToExpression(JSONObject binary, boolean appendString) {
 
-        var left = handleExpression(binary.getJSONObject("lhs"));
-        var right = handleExpression(binary.getJSONObject("rhs"));
-        var operator = toBinaryOperator(binary.getString("op"));
-        return new BinaryExpr(left, right, operator);
+        var leftExpression = handleExpression(binary.getJSONObject("lhs"));
+        var operator = binary.getString("op");
+
+        if (appendString || operator.equalsIgnoreCase("Add") && leftExpression instanceof StringLiteralExpr) {
+            return new BinaryExpr(leftExpression, handleExpression(binary.getJSONObject("rhs"), true),
+                    toBinaryOperator(binary.getString("op")));
+        } else {
+            return new MethodCallExpr("handleBinary", leftExpression, new StringLiteralExpr(operator),
+                    handleExpression(binary.getJSONObject("rhs")));
+        }
     }
 
     private static Expression letToExpression(JSONObject value) {
@@ -328,13 +348,14 @@ public class RinhaAstToJavaSource {
 
     private static Statement toIfStmt(JSONObject expresion) {
 
-        var condition = handleExpression(expresion.getJSONObject("condition"));
+        var condition = new CastExpr(new ClassOrInterfaceType(null, "Boolean"),
+                handleExpression(expresion.getJSONObject("condition")));
 
         var thenStm = new BlockStmt();
-        populateBlockBody(thenStm, expresion.getJSONObject("then"), true);
+        populateBlockBody(thenStm, expresion.getJSONObject("then"));
 
         var elseStm = new BlockStmt();
-        populateBlockBody(elseStm, expresion.getJSONObject("otherwise"), true);
+        populateBlockBody(elseStm, expresion.getJSONObject("otherwise"));
 
         return new IfStmt(condition, thenStm, elseStm);
     }
@@ -345,9 +366,21 @@ public class RinhaAstToJavaSource {
 
     private static Expression callToExpression(JSONObject expression) {
         var callee = expression.getJSONObject("callee").getString("text");
-        var arguments = expression.getJSONArray("arguments").stream()
-                .map(argument -> handleExpression((JSONObject) argument)).toArray(Expression[]::new);
-        return new MethodCallExpr(callee, arguments);
+       
+        if(expression.getJSONArray("arguments").size() > 0) {
+            var arguments = expression.getJSONArray("arguments").stream()
+                    .map(argument -> {
+                        var argumentJsonObject = (JSONObject) argument;
+                        if ("Function".equalsIgnoreCase(argumentJsonObject.getString("kind"))) {
+                            argumentJsonObject = argumentJsonObject.getJSONObject("value");
+                        }
+                        return handleExpression(argumentJsonObject);
+                    }).toArray(Expression[]::new);
+    
+            return new MethodCallExpr(callee, arguments);
+        }else {
+            return handleExpression(expression.getJSONObject("callee"));
+        }
     }
 
     private static Expression callFirstToExpression(JSONObject expression) {

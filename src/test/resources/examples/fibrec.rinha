@@ -1,0 +1,19 @@
+let fibrec = fn (wn, wk1, wk2) => {
+    let n = wn();
+    let k1 = wk1();
+    let k2 = wk2();
+    if (n == 0) {
+    k1
+    } else {
+    if (n == 1) {
+        k2
+    } else {
+        fibrec(fn () => {n - 1}, fn () => k2, fn () => {k1 + k2})
+    }
+    }
+};
+let fib = fn (wn) => {
+    let n = wn();
+    fibrec(fn () => n, fn () => 0, fn () => 1)
+};
+print(fib(fn () => 100000))

@@ -1,0 +1,543 @@
+{
+	"name": "examples/fibrec1.rinha",
+	"expression": {
+		"kind": "Let",
+		"name": {
+			"text": "fibrec",
+			"location": {
+				"start": 4,
+				"end": 10,
+				"filename": "examples/fibrec1.rinha"
+			}
+		},
+		"value": {
+			"kind": "Function",
+			"parameters": [
+				{
+					"text": "wn",
+					"location": {
+						"start": 17,
+						"end": 19,
+						"filename": "examples/fibrec1.rinha"
+					}
+				},
+				{
+					"text": "wk1",
+					"location": {
+						"start": 21,
+						"end": 24,
+						"filename": "examples/fibrec1.rinha"
+					}
+				},
+				{
+					"text": "wk2",
+					"location": {
+						"start": 26,
+						"end": 29,
+						"filename": "examples/fibrec1.rinha"
+					}
+				}
+			],
+			"value": {
+				"kind": "Let",
+				"name": {
+					"text": "n",
+					"location": {
+						"start": 44,
+						"end": 45,
+						"filename": "examples/fibrec1.rinha"
+					}
+				},
+				"value": {
+					"kind": "Call",
+					"callee": {
+						"kind": "Var",
+						"text": "wn",
+						"location": {
+							"start": 48,
+							"end": 50,
+							"filename": "examples/fibrec1.rinha"
+						}
+					},
+					"arguments": [],
+					"location": {
+						"start": 48,
+						"end": 52,
+						"filename": "examples/fibrec1.rinha"
+					}
+				},
+				"next": {
+					"kind": "Let",
+					"name": {
+						"text": "k1",
+						"location": {
+							"start": 62,
+							"end": 64,
+							"filename": "examples/fibrec1.rinha"
+						}
+					},
+					"value": {
+						"kind": "Call",
+						"callee": {
+							"kind": "Var",
+							"text": "wk1",
+							"location": {
+								"start": 67,
+								"end": 70,
+								"filename": "examples/fibrec1.rinha"
+							}
+						},
+						"arguments": [],
+						"location": {
+							"start": 67,
+							"end": 72,
+							"filename": "examples/fibrec1.rinha"
+						}
+					},
+					"next": {
+						"kind": "Let",
+						"name": {
+							"text": "k2",
+							"location": {
+								"start": 82,
+								"end": 84,
+								"filename": "examples/fibrec1.rinha"
+							}
+						},
+						"value": {
+							"kind": "Call",
+							"callee": {
+								"kind": "Var",
+								"text": "wk2",
+								"location": {
+									"start": 87,
+									"end": 90,
+									"filename": "examples/fibrec1.rinha"
+								}
+							},
+							"arguments": [],
+							"location": {
+								"start": 87,
+								"end": 92,
+								"filename": "examples/fibrec1.rinha"
+							}
+						},
+						"next": {
+							"kind": "If",
+							"condition": {
+								"kind": "Binary",
+								"lhs": {
+									"kind": "Var",
+									"text": "n",
+									"location": {
+										"start": 102,
+										"end": 103,
+										"filename": "examples/fibrec1.rinha"
+									}
+								},
+								"op": "Eq",
+								"rhs": {
+									"kind": "Int",
+									"value": 0,
+									"location": {
+										"start": 107,
+										"end": 108,
+										"filename": "examples/fibrec1.rinha"
+									}
+								},
+								"location": {
+									"start": 102,
+									"end": 108,
+									"filename": "examples/fibrec1.rinha"
+								}
+							},
+							"then": {
+								"kind": "Var",
+								"text": "k1",
+								"location": {
+									"start": 116,
+									"end": 118,
+									"filename": "examples/fibrec1.rinha"
+								}
+							},
+							"otherwise": {
+								"kind": "If",
+								"condition": {
+									"kind": "Binary",
+									"lhs": {
+										"kind": "Var",
+										"text": "n",
+										"location": {
+											"start": 140,
+											"end": 141,
+											"filename": "examples/fibrec1.rinha"
+										}
+									},
+									"op": "Eq",
+									"rhs": {
+										"kind": "Int",
+										"value": 1,
+										"location": {
+											"start": 145,
+											"end": 146,
+											"filename": "examples/fibrec1.rinha"
+										}
+									},
+									"location": {
+										"start": 140,
+										"end": 146,
+										"filename": "examples/fibrec1.rinha"
+									}
+								},
+								"then": {
+									"kind": "Var",
+									"text": "k2",
+									"location": {
+										"start": 158,
+										"end": 160,
+										"filename": "examples/fibrec1.rinha"
+									}
+								},
+								"otherwise": {
+									"kind": "Call",
+									"callee": {
+										"kind": "Var",
+										"text": "fibrec",
+										"location": {
+											"start": 182,
+											"end": 188,
+											"filename": "examples/fibrec1.rinha"
+										}
+									},
+									"arguments": [
+										{
+											"kind": "Function",
+											"parameters": [],
+											"value": {
+												"kind": "Binary",
+												"lhs": {
+													"kind": "Var",
+													"text": "n",
+													"location": {
+														"start": 199,
+														"end": 200,
+														"filename": "examples/fibrec1.rinha"
+													}
+												},
+												"op": "Sub",
+												"rhs": {
+													"kind": "Int",
+													"value": 1,
+													"location": {
+														"start": 203,
+														"end": 204,
+														"filename": "examples/fibrec1.rinha"
+													}
+												},
+												"location": {
+													"start": 199,
+													"end": 204,
+													"filename": "examples/fibrec1.rinha"
+												}
+											},
+											"location": {
+												"start": 189,
+												"end": 205,
+												"filename": "examples/fibrec1.rinha"
+											}
+										},
+										{
+											"kind": "Function",
+											"parameters": [],
+											"value": {
+												"kind": "Var",
+												"text": "k2",
+												"location": {
+													"start": 216,
+													"end": 218,
+													"filename": "examples/fibrec1.rinha"
+												}
+											},
+											"location": {
+												"start": 207,
+												"end": 218,
+												"filename": "examples/fibrec1.rinha"
+											}
+										},
+										{
+											"kind": "Function",
+											"parameters": [],
+											"value": {
+												"kind": "Binary",
+												"lhs": {
+													"kind": "Var",
+													"text": "k1",
+													"location": {
+														"start": 230,
+														"end": 232,
+														"filename": "examples/fibrec1.rinha"
+													}
+												},
+												"op": "Add",
+												"rhs": {
+													"kind": "Var",
+													"text": "k2",
+													"location": {
+														"start": 235,
+														"end": 237,
+														"filename": "examples/fibrec1.rinha"
+													}
+												},
+												"location": {
+													"start": 230,
+													"end": 237,
+													"filename": "examples/fibrec1.rinha"
+												}
+											},
+											"location": {
+												"start": 220,
+												"end": 238,
+												"filename": "examples/fibrec1.rinha"
+											}
+										}
+									],
+									"location": {
+										"start": 182,
+										"end": 239,
+										"filename": "examples/fibrec1.rinha"
+									}
+								},
+								"location": {
+									"start": 136,
+									"end": 245,
+									"filename": "examples/fibrec1.rinha"
+								}
+							},
+							"location": {
+								"start": 98,
+								"end": 251,
+								"filename": "examples/fibrec1.rinha"
+							}
+						},
+						"location": {
+							"start": 78,
+							"end": 251,
+							"filename": "examples/fibrec1.rinha"
+						}
+					},
+					"location": {
+						"start": 58,
+						"end": 251,
+						"filename": "examples/fibrec1.rinha"
+					}
+				},
+				"location": {
+					"start": 40,
+					"end": 251,
+					"filename": "examples/fibrec1.rinha"
+				}
+			},
+			"location": {
+				"start": 13,
+				"end": 253,
+				"filename": "examples/fibrec1.rinha"
+			}
+		},
+		"next": {
+			"kind": "Let",
+			"name": {
+				"text": "fib",
+				"location": {
+					"start": 259,
+					"end": 262,
+					"filename": "examples/fibrec1.rinha"
+				}
+			},
+			"value": {
+				"kind": "Function",
+				"parameters": [
+					{
+						"text": "wn",
+						"location": {
+							"start": 269,
+							"end": 271,
+							"filename": "examples/fibrec1.rinha"
+						}
+					}
+				],
+				"value": {
+					"kind": "Let",
+					"name": {
+						"text": "n",
+						"location": {
+							"start": 286,
+							"end": 287,
+							"filename": "examples/fibrec1.rinha"
+						}
+					},
+					"value": {
+						"kind": "Call",
+						"callee": {
+							"kind": "Var",
+							"text": "wn",
+							"location": {
+								"start": 290,
+								"end": 292,
+								"filename": "examples/fibrec1.rinha"
+							}
+						},
+						"arguments": [],
+						"location": {
+							"start": 290,
+							"end": 294,
+							"filename": "examples/fibrec1.rinha"
+						}
+					},
+					"next": {
+						"kind": "Call",
+						"callee": {
+							"kind": "Var",
+							"text": "fibrec",
+							"location": {
+								"start": 300,
+								"end": 306,
+								"filename": "examples/fibrec1.rinha"
+							}
+						},
+						"arguments": [
+							{
+								"kind": "Function",
+								"parameters": [],
+								"value": {
+									"kind": "Var",
+									"text": "n",
+									"location": {
+										"start": 316,
+										"end": 317,
+										"filename": "examples/fibrec1.rinha"
+									}
+								},
+								"location": {
+									"start": 307,
+									"end": 317,
+									"filename": "examples/fibrec1.rinha"
+								}
+							},
+							{
+								"kind": "Function",
+								"parameters": [],
+								"value": {
+									"kind": "Int",
+									"value": 0,
+									"location": {
+										"start": 328,
+										"end": 329,
+										"filename": "examples/fibrec1.rinha"
+									}
+								},
+								"location": {
+									"start": 319,
+									"end": 329,
+									"filename": "examples/fibrec1.rinha"
+								}
+							},
+							{
+								"kind": "Function",
+								"parameters": [],
+								"value": {
+									"kind": "Int",
+									"value": 1,
+									"location": {
+										"start": 340,
+										"end": 341,
+										"filename": "examples/fibrec1.rinha"
+									}
+								},
+								"location": {
+									"start": 331,
+									"end": 341,
+									"filename": "examples/fibrec1.rinha"
+								}
+							}
+						],
+						"location": {
+							"start": 300,
+							"end": 342,
+							"filename": "examples/fibrec1.rinha"
+						}
+					},
+					"location": {
+						"start": 282,
+						"end": 342,
+						"filename": "examples/fibrec1.rinha"
+					}
+				},
+				"location": {
+					"start": 265,
+					"end": 344,
+					"filename": "examples/fibrec1.rinha"
+				}
+			},
+			"next": {
+				"kind": "Print",
+				"value": {
+					"kind": "Call",
+					"callee": {
+						"kind": "Var",
+						"text": "fib",
+						"location": {
+							"start": 352,
+							"end": 355,
+							"filename": "examples/fibrec1.rinha"
+						}
+					},
+					"arguments": [
+						{
+							"kind": "Function",
+							"parameters": [],
+							"value": {
+								"kind": "Int",
+								"value": 10,
+								"location": {
+									"start": 365,
+									"end": 371,
+									"filename": "examples/fibrec1.rinha"
+								}
+							},
+							"location": {
+								"start": 356,
+								"end": 371,
+								"filename": "examples/fibrec1.rinha"
+							}
+						}
+					],
+					"location": {
+						"start": 352,
+						"end": 372,
+						"filename": "examples/fibrec1.rinha"
+					}
+				},
+				"location": {
+					"start": 346,
+					"end": 373,
+					"filename": "examples/fibrec1.rinha"
+				}
+			},
+			"location": {
+				"start": 255,
+				"end": 373,
+				"filename": "examples/fibrec1.rinha"
+			}
+		},
+		"location": {
+			"start": 0,
+			"end": 373,
+			"filename": "examples/fibrec1.rinha"
+		}
+	},
+	"location": {
+		"start": 0,
+		"end": 373,
+		"filename": "examples/fibrec1.rinha"
+	}
+}
