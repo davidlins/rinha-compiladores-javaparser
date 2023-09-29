@@ -99,12 +99,22 @@ class RinhaAstToJavaSourceTest {
         run("/examples/let_print.json", "1\n2");
     }
     
+        
 //    @Test
 //    @SneakyThrows
 //    void testFunctionPrint() {
 //        run("/examples/function_print.json", "1\n2");
 //    }
     
+   
+    // precisa ver porque nao orderna o 0
+    @Test
+    @SneakyThrows
+    void testSortedInsert() {
+        run("/examples/sortedInsert.json", "(1, (2, (3, (4, (5, 0)))))");
+    }
+    
+   
     
     
     @SneakyThrows

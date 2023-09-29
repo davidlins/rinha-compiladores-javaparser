@@ -23,12 +23,12 @@ public class Tuple {
         return "(" + first + ", " + second + ")";
     }
     
-    public static Object first(Tuple tuple) {
-        return tuple.getFirst();
+    public static Object first(Object tuple) {
+        return ((Tuple) tuple).getFirst();
     }
 
-    public static Object second(Tuple tuple) {
-        return tuple.getSecond();
+    public static Object second(Object tuple) {
+        return ((Tuple) tuple).getSecond();
     }
     
 }
